@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": false,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "lib": ["ES2020", "dom", "dom.iterable"],
+    "types": []
+  },
+  "include": [
+    "./assets/**/*.ts"
+  ]
+}

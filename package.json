@@ -1,0 +1,22 @@
+{
+  "name": "@besnovatyj/yii2-cms-admin-panel-build",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Сборка фронтенда админ-панели: палитра команд (Ctrl/Cmd+K) → dist/admin-palette.(js|css).",
+  "scripts": {
+    "build": "node esbuild.js",
+    "type-check": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">= 23.3.0",
+    "npm": ">= 10.0.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.0": true
+  }
+}
