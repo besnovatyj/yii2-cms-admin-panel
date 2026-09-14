@@ -6,8 +6,11 @@ import { loadRecent, pushRecent } from './recent';
 import { matchText, normalize, type MatchResult } from './search';
 import type { PaletteConfig, PaletteHandle, PaletteIndexResponse, PaletteLinkDto, PaletteSectionDto } from './types';
 
-/** Время жизни кэша индекса во вкладке: меню меняется только при установке/удалении модулей. */
-const CACHE_TTL_MS = 10 * 60 * 1000;
+/**
+ * Время жизни кэша индекса: меню меняется только при установке/удалении модулей, поэтому срок большой.
+ * Устаревший индекс сбрасывается кнопкой «Обновить» в футере палитры — ждать истечения TTL не нужно.
+ */
+const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
 /** Строка поиска + карта админки: палитра показывает разделы, а не только результаты запроса. */
 interface RenderedSection {
@@ -33,6 +36,7 @@ export class CommandPalette implements PaletteHandle {
     private readonly root: HTMLDivElement;
     private readonly input: HTMLInputElement;
     private readonly body: HTMLDivElement;
+    private readonly refreshButton: HTMLButtonElement;
 
     private sections: readonly PaletteSectionDto[] = [];
     private status: Status = 'idle';
@@ -73,14 +77,37 @@ export class CommandPalette implements PaletteHandle {
         this.input.spellcheck = false;
         this.input.addEventListener('input', () => this.render());
 
+        // Закрытие палитры. На десктопе элемент выглядит подсказкой «Esc», на узком экране — крестиком:
+        // там диалог занимает весь экран, подложки рядом с ним нет и закрыть палитру больше нечем.
+        const close = document.createElement('button');
+        close.type = 'button';
+        close.className = 'bes-palette__close';
+        close.setAttribute('aria-label', 'Закрыть');
+        close.addEventListener('click', () => this.close());
+
         const escape = document.createElement('kbd');
         escape.className = 'bes-palette__esc';
         escape.textContent = 'Esc';
 
-        search.append(icon, this.input, escape);
+        const closeIcon = document.createElement('i');
+        closeIcon.className = 'bi bi-x-lg bes-palette__close-icon';
+        closeIcon.setAttribute('aria-hidden', 'true');
+
+        close.append(escape, closeIcon);
+
+        search.append(icon, this.input, close);
 
         this.body = document.createElement('div');
         this.body.className = 'bes-palette__body';
+
+        this.refreshButton = document.createElement('button');
+        this.refreshButton.type = 'button';
+        this.refreshButton.className = 'bes-palette__refresh';
+        this.refreshButton.title = 'Перечитать разделы с сервера (кэш живёт долго, меню меняется при установке модулей)';
+        const refreshIcon = document.createElement('i');
+        refreshIcon.className = 'bi bi-arrow-clockwise';
+        this.refreshButton.append(refreshIcon, document.createTextNode(' Обновить'));
+        this.refreshButton.addEventListener('click', () => void this.refresh());
 
         const footer = document.createElement('div');
         footer.className = 'bes-palette__footer';
@@ -89,6 +116,7 @@ export class CommandPalette implements PaletteHandle {
             hint('Enter', 'открыть'),
             hint('Ctrl + Enter', 'в новой вкладке'),
             hint('Esc', 'закрыть'),
+            this.refreshButton,
         );
 
         dialog.append(search, this.body, footer);
@@ -203,6 +231,24 @@ export class CommandPalette implements PaletteHandle {
         if (trigger !== null) {
             event.preventDefault();
             this.open();
+        }
+    }
+
+    /**
+     * Принудительно перечитывает индекс: кэш сбрасывается, палитра остаётся открытой.
+     *
+     * Нужна, потому что кэш переживает перезагрузку страницы и закрытие вкладки: после установки модуля
+     * или recompile меню иначе обновилось бы только по истечении {@see CACHE_TTL_MS}. Сброс чисто
+     * клиентский — на сервере индекс не кэшируется, он собирается на каждый запрос.
+     */
+    private async refresh(): Promise<void> {
+        this.dropCache();
+        this.status = 'idle';
+        this.refreshButton.disabled = true;
+        try {
+            await this.ensureIndex();
+        } finally {
+            this.refreshButton.disabled = false;
         }
     }
 
@@ -413,9 +459,18 @@ export class CommandPalette implements PaletteHandle {
         }
     }
 
+    /**
+     * Ключ кэша индекса. Хранилище — localStorage, как и у списка недавних: индекс приватный, но ключ
+     * привязан к пользователю, а кэш, переживающий закрытие вкладки, экономит запрос на каждом новом
+     * окне админки (на медленном сервере разработки это секунды ожидания при каждом открытии палитры).
+     */
+    private cacheKey(): string {
+        return `${this.config.storageKey}.index`;
+    }
+
     private readCache(): PaletteIndexResponse | null {
         try {
-            const raw = window.sessionStorage.getItem(`${this.config.storageKey}.index`);
+            const raw = window.localStorage.getItem(this.cacheKey());
             if (raw === null) {
                 return null;
             }
@@ -430,9 +485,17 @@ export class CommandPalette implements PaletteHandle {
     private writeCache(data: PaletteIndexResponse): void {
         try {
             const payload: CachedIndex = { ts: Date.now(), data };
-            window.sessionStorage.setItem(`${this.config.storageKey}.index`, JSON.stringify(payload));
+            window.localStorage.setItem(this.cacheKey(), JSON.stringify(payload));
         } catch {
             // Кэш — оптимизация; без него палитра просто запросит индекс заново.
+        }
+    }
+
+    private dropCache(): void {
+        try {
+            window.localStorage.removeItem(this.cacheKey());
+        } catch {
+            // Хранилище недоступно — значит и кэша нет, сбрасывать нечего.
         }
     }
 }

@@ -77,13 +77,33 @@ body.bes-palette-open {
     color: var(--bs-secondary-color, #6c757d);
 }
 
-.bes-palette__esc {
+/* Кнопка закрытия: один элемент на все ширины, меняется только его содержимое (см. media-запрос ниже). */
+.bes-palette__close {
     flex: none;
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.bes-palette__esc {
     font-size: .75rem;
     padding: .15rem .4rem;
     border-radius: .25rem;
     background: var(--bs-tertiary-bg, #f8f9fa);
     color: var(--bs-secondary-color, #6c757d);
+}
+
+.bes-palette__close:hover .bes-palette__esc {
+    color: var(--bs-body-color, #212529);
+}
+
+/* На десктопе крестик не нужен: там есть и клавиша, и клик по подложке. */
+.bes-palette__close-icon {
+    display: none;
 }
 
 /* --- Карта разделов ------------------------------------------------------------------------ */
@@ -126,7 +146,14 @@ body.bes-palette-open {
     font-weight: 600;
     letter-spacing: .04em;
     text-transform: uppercase;
-    color: var(--bs-secondary-color, #6c757d);
+    /*
+     * Единственное цветовое отличие разделов: рамки и жирный шрифт добавили бы высоту, цвет — нет.
+     * Взят `info`, а не `primary`: синим в палитре уже подсвечены совпадения запроса и активный пункт,
+     * заголовки не должны с ними конкурировать. Именно `-text-emphasis`, а не сам `--bs-info`: стоковый
+     * #0dcaf0 на светлом фоне даёт контраст около 1.9:1 и для шрифта 12px нечитаем, тогда как
+     * emphasis-вариант (#087990) — около 4.9:1. В тёмной теме Bootstrap подменяет его сам.
+     */
+    color: var(--bs-info-text-emphasis, #087990);
 }
 
 .bes-palette__list {
@@ -199,6 +226,32 @@ body.bes-palette-open {
     color: var(--bs-secondary-color, #6c757d);
 }
 
+/* Сброс кэша индекса: прижат к правому краю футера, не перебивает подсказки по клавишам. */
+.bes-palette__refresh {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .1rem .45rem;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: .25rem;
+    background: var(--bs-body-bg, #fff);
+    color: inherit;
+    font-size: .75rem;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.bes-palette__refresh:hover:not(:disabled) {
+    color: var(--bs-body-color, #212529);
+    border-color: var(--bs-secondary-color, #6c757d);
+}
+
+.bes-palette__refresh:disabled {
+    opacity: .65;
+    cursor: default;
+}
+
 .bes-palette__hint kbd {
     padding: .1rem .35rem;
     border-radius: .25rem;
@@ -223,5 +276,21 @@ body.bes-palette-open {
 
     .bes-palette__footer {
         display: none;
+    }
+
+    /* Подсказка по клавише на телефоне бессмысленна — её место занимает тап-цель 44×44. */
+    .bes-palette__esc {
+        display: none;
+    }
+
+    .bes-palette__close-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        margin-right: -.5rem;
+        font-size: 1.125rem;
+        color: var(--bs-secondary-color, #6c757d);
     }
 }

@@ -61,7 +61,7 @@ class CommandPaletteWidget extends Widget
         $config = Json::encode([
             'endpoint' => Url::to(['/AdminPanel/backend/palette/index']),
             'hotkey' => (string)($this->hotkey ?? $params['hotkey'] ?? 'k'),
-            // Индекс приватный (режется правами), поэтому кэш вкладки привязан к пользователю.
+            // Индекс приватный (режется правами), поэтому кэш привязан к пользователю.
             'storageKey' => 'bescms.adminPanel.palette.' . (string)(Yii::$app->user->getId() ?? 'guest'),
         ]);
 
