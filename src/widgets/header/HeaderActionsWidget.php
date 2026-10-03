@@ -10,6 +10,7 @@ namespace Besnovatyj\AdminPanel\widgets\header;
 
 use Besnovatyj\AdminPanel\Module;
 use Besnovatyj\AdminPanel\services\AdminMenuIndex;
+use Besnovatyj\Contracts\adminMenu\AdminMenuLocation;
 use Yii;
 use yii\base\Widget;
 
@@ -17,8 +18,8 @@ use yii\base\Widget;
  * Кнопки быстрых действий в шапке админки.
  *
  * Заменяет хардкод кнопок в layout'е приложения: любой модуль кладёт свою кнопку в локацию меню
- * `header-quick-links` (обычным `_meta.placements` в своём `adminMenu.php`) и она появляется в шапке —
- * менять layout под каждый новый модуль больше не нужно.
+ * {@see AdminMenuLocation::HeaderQuickLinks} (обычным размещением в своём `adminMenu.php`) и она
+ * появляется в шапке — менять layout под каждый новый модуль больше не нужно.
  *
  * Первой рендерится кнопка палитры команд (дублёр Ctrl/Cmd+K для тех, кто про хоткей не знает);
  * отключается настройкой `params.palette.enabled` или свойством {@see $showPaletteButton}.
@@ -35,14 +36,16 @@ use yii\base\Widget;
  *     'iconClass' => 'bi bi-folder2-open',
  *     'url' => ['/File/backend/file/index'],
  *     'linkOptions' => ['class' => 'btn btn-sm btn-warning', 'title' => 'Файловый менеджер'],
- *     '_meta' => ['placements' => [['location' => 'header-quick-links', 'priority' => 100]]],
+ *     '_meta' => ['placements' => [
+ *         new AdminMenuPlacement(location: AdminMenuLocation::HeaderQuickLinks, priority: 100),
+ *     ]],
  * ]
  * ```
  */
 class HeaderActionsWidget extends Widget
 {
-    /** Локация меню, из которой берутся кнопки; null — из настроек модуля. */
-    public ?string $location = null;
+    /** Локация меню, из которой берутся кнопки; null — из настроек модуля (`params.header.location`). */
+    public ?AdminMenuLocation $location = null;
 
     /** Показывать ли кнопку открытия палитры команд. */
     public bool $showPaletteButton = true;
@@ -69,7 +72,7 @@ class HeaderActionsWidget extends Widget
         $module = Yii::$app->getModule(Module::MODULE_ID);
         $params = (array)($module?->params ?? []);
 
-        $location = $this->location ?? (string)($params['header']['location'] ?? 'header-quick-links');
+        $location = $this->location ?? $params['header']['location'];
         $paletteEnabled = $this->showPaletteButton && ($params['palette']['enabled'] ?? true) !== false;
 
         return $this->render('actions', [

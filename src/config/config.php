@@ -6,6 +6,8 @@
 
 declare(strict_types=1);
 
+use Besnovatyj\Contracts\adminMenu\AdminMenuLocation;
+
 /**
  * Базовая конфигурация Yii-модуля админ-панели.
  *
@@ -24,9 +26,9 @@ return [
             // Подключать палитру ко всем страницам админки автоматически (см. Bootstrap). Если false —
             // вставить `CommandPaletteWidget::widget()` в layout вручную.
             'autoInject' => true,
-            // Локации меню, попадающие в палитру. Локации-действия (`header-quick-links`) не индексируются:
+            // Локации меню, попадающие в палитру. Локации-действия (HeaderQuickLinks) не индексируются:
             // это кнопки, а не разделы.
-            'locations' => ['left-sidebar', 'right-sidebar'],
+            'locations' => [AdminMenuLocation::LeftSidebar, AdminMenuLocation::RightSidebar],
             // Клавиша, открывающая палитру вместе с Ctrl (Windows/Linux) или Cmd (macOS).
             'hotkey' => 'k',
         ],
@@ -34,13 +36,13 @@ return [
         // Страница «Настройки» (/AdminPanel/backend/settings/index).
         'settingsPage' => [
             // Локации, разделы которых показываются карточками. По умолчанию — служебный сайдбар.
-            'locations' => ['right-sidebar'],
+            'locations' => [AdminMenuLocation::RightSidebar],
         ],
 
         // Быстрые действия в шапке админки.
         'header' => [
             // Локация меню, из которой модули поставляют кнопки шапки.
-            'location' => 'header-quick-links',
+            'location' => AdminMenuLocation::HeaderQuickLinks,
         ],
     ],
 ];

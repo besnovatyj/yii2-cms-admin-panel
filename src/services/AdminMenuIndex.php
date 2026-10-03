@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Besnovatyj\AdminPanel\services;
 
+use Besnovatyj\Contracts\adminMenu\AdminMenuLocation;
 use Besnovatyj\Kernel\security\MenuAccessFilter;
 use Besnovatyj\Modman\menu\MenuProvider;
 use Closure;
@@ -28,7 +29,7 @@ use yii\helpers\Url;
  */
 final class AdminMenuIndex
 {
-    /** @var array<string, MenuSection[]> location => разделы (кэш на запрос) */
+    /** @var array<string, MenuSection[]> значение локации => разделы (кэш на запрос) */
     private array $byLocation = [];
 
     /** @var array<int, array>|null Вклады группы `admin-menu` (кэш на запрос). */
@@ -48,18 +49,18 @@ final class AdminMenuIndex
     /**
      * Разделы одной локации.
      *
-     * @param string $location Локация меню (`left-sidebar`, `right-sidebar`, `header-quick-links`, …).
+     * @param AdminMenuLocation $location Локация меню.
      * @return MenuSection[]
      */
-    public function sections(string $location): array
+    public function sections(AdminMenuLocation $location): array
     {
-        return $this->byLocation[$location] ??= $this->build($location);
+        return $this->byLocation[$location->value] ??= $this->build($location);
     }
 
     /**
      * Разделы нескольких локаций подряд, без повторов одного и того же маршрута.
      *
-     * @param string[] $locations Локации в порядке показа.
+     * @param AdminMenuLocation[] $locations Локации в порядке показа.
      * @return MenuSection[]
      */
     public function sectionsFor(array $locations): array
@@ -98,10 +99,10 @@ final class AdminMenuIndex
      * маршрутом. Пункт-действие показывается всем, кому доступна сама админка; ограничить его —
      * ответственность модуля, который его объявил.
      *
-     * @param string $location Локация меню (по умолчанию модуль использует `header-quick-links`).
+     * @param AdminMenuLocation $location Локация-действия (см. `params.header.location`).
      * @return array<int, array<string, mixed>>
      */
-    public function actions(string $location): array
+    public function actions(AdminMenuLocation $location): array
     {
         return $this->filterActions($this->provider->forLocation($location, $this->contributions()));
     }
@@ -109,7 +110,7 @@ final class AdminMenuIndex
     /**
      * Индекс нескольких локаций в виде массива — тело JSON-ответа для палитры.
      *
-     * @param string[] $locations
+     * @param AdminMenuLocation[] $locations
      * @return array{sections: array<int, array<string, mixed>>}
      */
     public function toArray(array $locations): array
@@ -127,7 +128,7 @@ final class AdminMenuIndex
      *
      * @return MenuSection[]
      */
-    private function build(string $location): array
+    private function build(AdminMenuLocation $location): array
     {
         $tree = MenuAccessFilter::filter($this->provider->forLocation($location, $this->contributions()));
 

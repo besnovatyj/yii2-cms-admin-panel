@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Besnovatyj\AdminPanel;
 
 use Besnovatyj\Contracts\module\DeclaresModule;
-use Besnovatyj\Contracts\module\ProvidesAdminMenu;
 use Besnovatyj\Contracts\module\ProvidesAppConfig;
 use Besnovatyj\Contracts\module\ProvidesBootstrap;
 use Besnovatyj\Kernel\module\CmsModule;
@@ -22,7 +21,7 @@ use Besnovatyj\Kernel\module\CmsModule;
  * способами:
  *  - палитра команд ({@see widgets\palette\CommandPaletteWidget}) — Ctrl/Cmd+K, поиск + видимая карта
  *    всех разделов; закрывает проблему «служебных пунктов много, где что — не помню»;
- *  - быстрые действия в шапке ({@see widgets\header\HeaderActionsWidget}) — локация `header-quick-links`,
+ *  - быстрые действия в шапке ({@see widgets\header\HeaderActionsWidget}) — локация `AdminMenuLocation::HeaderQuickLinks`,
  *    куда любой модуль кладёт свою кнопку вместо правки layout'а приложения;
  *  - страница «Настройки» ({@see controllers\backend\SettingsController}) — служебные разделы
  *    карточками на полноценном экране, а не в узком offcanvas.
@@ -31,7 +30,7 @@ use Besnovatyj\Kernel\module\CmsModule;
  * который фильтруется правами текущего пользователя.
  */
 class Module extends CmsModule implements
-    DeclaresModule, ProvidesAdminMenu,
+    DeclaresModule,
     ProvidesAppConfig, ProvidesBootstrap
 {
     public const bool EDITABLE = true;
@@ -41,7 +40,6 @@ class Module extends CmsModule implements
     public static function moduleId(): string { return self::MODULE_ID; }
     public static function moduleVersion(): string { return self::VERSION; }
     public static function isEditable(): bool { return self::EDITABLE; }
-    public static function adminMenu(): array { return require __DIR__ . '/config/adminMenu.php'; }
     public static function moduleConfig(): array { return require __DIR__ . '/config/config.php'; }
     public static function bootstrapClasses(): array { return [Bootstrap::class]; }
 

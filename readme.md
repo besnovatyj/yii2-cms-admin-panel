@@ -11,10 +11,11 @@
 | Возможность | Где | Зачем |
 |---|---|---|
 | Палитра команд `Ctrl/Cmd + K` | любая страница админки | поиск по всем разделам **и видимая карта админки** — не нужно помнить, где что лежит |
-| Кнопки быстрых действий | шапка админки | модули кладут свои кнопки в локацию `header-quick-links` вместо правки layout'а приложения |
+| Кнопки быстрых действий | шапка админки | модули кладут свои кнопки в локацию `AdminMenuLocation::HeaderQuickLinks` вместо правки layout'а приложения |
 | Страница «Настройки» | `/AdminPanel/backend/settings/index` | служебные разделы карточками на полном экране, а не в узком offcanvas |
 
-Всё это — **один источник данных**: вклады `adminMenu.php` установленных модулей, скомпилированные
+Всё это — **один источник данных**: вклады `adminMenu.php` установленных модулей (формат пункта и
+список локаций — `Besnovatyj\Contracts\adminMenu\AdminMenuPlacement` / `AdminMenuLocation`), разложенные
 modman по локациям (`Besnovatyj\Modman\menu\MenuProvider`) и отфильтрованные RBAC
 (`Besnovatyj\Kernel\security\MenuAccessFilter`). Модуль ничего не знает о конкретных модулях и не
 имеет своей БД.
@@ -73,10 +74,9 @@ docker compose exec node sh -c 'cd /home/node/app/vendor/besnovatyj/yii2-cms-adm
     'iconClass' => 'bi bi-folder2-open',
     'url' => ['/File/backend/file/index'],
     'linkOptions' => ['class' => 'btn btn-sm btn-warning'],
-    '_meta' => ['placements' => [[
-        'location' => 'header-quick-links',
-        'priority' => 100,
-    ]]],
+    '_meta' => ['placements' => [
+        new AdminMenuPlacement(location: AdminMenuLocation::HeaderQuickLinks, priority: 100),
+    ]],
 ]
 ```
 
@@ -86,7 +86,7 @@ docker compose exec node sh -c 'cd /home/node/app/vendor/besnovatyj/yii2-cms-adm
 
 ## Страница «Настройки»
 
-Показывает разделы локаций из `params.settingsPage.locations` (по умолчанию `right-sidebar`)
+Показывает разделы локаций из `params.settingsPage.locations` (по умолчанию `AdminMenuLocation::RightSidebar`)
 карточками. Пункт «Настройки» модуль добавляет себе в правый сайдбар сам.
 
 ## Настройки модуля
@@ -97,10 +97,10 @@ docker compose exec node sh -c 'cd /home/node/app/vendor/besnovatyj/yii2-cms-adm
 |---|---|---|
 | `palette.enabled` | `true` | полностью отключить палитру |
 | `palette.autoInject` | `true` | подключать палитру ко всем страницам админки автоматически; при `false` виджет ставится в layout вручную |
-| `palette.locations` | `['left-sidebar', 'right-sidebar']` | какие локации попадают в индекс |
+| `palette.locations` | `[AdminMenuLocation::LeftSidebar, AdminMenuLocation::RightSidebar]` | какие локации попадают в индекс |
 | `palette.hotkey` | `'k'` | клавиша вместе с Ctrl/Cmd |
-| `settingsPage.locations` | `['right-sidebar']` | что показывает страница «Настройки» |
-| `header.location` | `'header-quick-links'` | откуда берутся кнопки шапки |
+| `settingsPage.locations` | `[AdminMenuLocation::RightSidebar]` | что показывает страница «Настройки» |
+| `header.location` | `AdminMenuLocation::HeaderQuickLinks` | откуда берутся кнопки шапки |
 
 ## Доступ
 
@@ -127,7 +127,7 @@ src/
 │   └── MenuLink.php                     пункт с уже разрешённым URL
 ├── views/backend/settings/index.php
 └── widgets/
-    ├── header/HeaderActionsWidget.php   кнопки локации header-quick-links
+    ├── header/HeaderActionsWidget.php   кнопки локации HeaderQuickLinks
     └── palette/CommandPaletteWidget.php инициализация палитры (ESM + AssetBundle)
 
 assets/                                  TypeScript (strict) палитры → dist/ через esbuild

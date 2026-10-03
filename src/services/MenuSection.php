@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Besnovatyj\AdminPanel\services;
 
+use Besnovatyj\Contracts\adminMenu\AdminMenuLocation;
+
 /**
  * Раздел админ-меню: группа пунктов одной локации (`Blog`, `Service`, `Logs`, …).
  *
@@ -19,13 +21,13 @@ final readonly class MenuSection
     /**
      * @param string|null $title    Заголовок группы; null — пункты вне групп.
      * @param string      $icon     CSS-класс иконки группы.
-     * @param string      $location Локация меню, из которой собран раздел.
+     * @param AdminMenuLocation $location Локация меню, из которой собран раздел.
      * @param MenuLink[]  $links    Пункты раздела в порядке, заданном приоритетами модулей.
      */
     public function __construct(
         public ?string $title,
         public string  $icon,
-        public string  $location,
+        public AdminMenuLocation $location,
         public array   $links,
     ) {}
 
@@ -37,7 +39,7 @@ final readonly class MenuSection
         return [
             'title' => $this->title,
             'icon' => $this->icon,
-            'location' => $this->location,
+            'location' => $this->location->value,
             'links' => array_map(static fn(MenuLink $link): array => $link->toArray(), $this->links),
         ];
     }

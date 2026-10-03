@@ -14,7 +14,7 @@ use yii\web\Controller;
 /**
  * Страница «Настройки» — служебные разделы админки на полноценном экране.
  *
- * Замена навигации в узком offcanvas: те же пункты (по умолчанию локация `right-sidebar`), но
+ * Замена навигации в узком offcanvas: те же пункты (по умолчанию правый сайдбар), но
  * карточками, с местом под заголовки групп и без охоты за маленькой кнопкой в шапке. Состав
  * определяется настройкой `params.settingsPage.locations` — страница ничего не знает о конкретных
  * модулях и показывает то, что они сами объявили в своих `adminMenu.php`.
@@ -32,10 +32,8 @@ class SettingsController extends Controller
 
     public function actionIndex(): string
     {
-        $locations = (array)($this->module->params['settingsPage']['locations'] ?? ['right-sidebar']);
-
         return $this->render('index', [
-            'sections' => $this->index->sectionsFor($locations),
+            'sections' => $this->index->sectionsFor($this->module->params['settingsPage']['locations']),
         ]);
     }
 }

@@ -6,6 +6,9 @@
 
 declare(strict_types=1);
 
+use Besnovatyj\Contracts\adminMenu\AdminMenuLocation;
+use Besnovatyj\Contracts\adminMenu\AdminMenuPlacement;
+
 return [[
     'label' => 'Настройки',
     'iconClass' => 'bi bi-sliders2 me-1',
@@ -15,14 +18,14 @@ return [[
     },
     '_meta' => [
         'placements' => [
-            [
-                'location' => 'right-sidebar',
-                'group' => 'Service',
-                'groupIcon' => 'bi bi-sliders',
+            new AdminMenuPlacement(
+                location: AdminMenuLocation::RightSidebar,
+                group: 'Service',
+                groupIcon: 'bi bi-sliders',
                 // Выше остальных служебных пунктов: это точка входа во все настройки.
-                'priority' => 10,
-                'groupPriority' => 100,
-            ],
+                groupPriority: 100,
+                priority: 10,
+            ),
         ],
     ],
 ]];

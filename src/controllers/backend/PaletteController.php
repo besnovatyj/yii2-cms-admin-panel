@@ -60,8 +60,6 @@ class PaletteController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         Yii::$app->response->headers->set('Cache-Control', 'no-store, private');
 
-        $locations = (array)($this->module->params['palette']['locations'] ?? ['left-sidebar', 'right-sidebar']);
-
-        return $this->index->toArray($locations);
+        return $this->index->toArray($this->module->params['palette']['locations']);
     }
 }
