@@ -10,7 +10,6 @@
     }
   ],
   "minimum-stability": "stable",
-  "version": "1.0.0",
   "extra": {
     "moduleClass": "Besnovatyj\\AdminPanel\\Module",
     "moduleId": "AdminPanel",
@@ -42,7 +41,7 @@
   "require": {
     "besnovatyj/yii2-cms-contracts": "^2.0",
     "besnovatyj/yii2-cms-kernel": "^1.0",
-    "besnovatyj/yii2-cms-modman": "^1.0",
+    "besnovatyj/yii2-cms-modman": "^2.0",
     "php": ">=8.4",
     "yiisoft/yii2": "~2.0",
     "yiisoft/yii2-bootstrap5": "~2.0"
