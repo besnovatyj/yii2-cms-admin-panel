@@ -20,7 +20,6 @@ return [
         Module::moduleId() => array_merge(
             ['class' => Module::class],
             Module::moduleConfig(),
-            ['version' => Module::moduleVersion()],
         ),
     ],
     // L2-bootstrap: DI-проводка индекса меню + автоподключение палитры к страницам админки. Нужен

@@ -34,11 +34,9 @@ class Module extends CmsModule implements
     ProvidesAppConfig, ProvidesBootstrap
 {
     public const bool EDITABLE = true;
-    public const string VERSION = '1.0.0';
     public const string MODULE_ID = 'AdminPanel';
 
     public static function moduleId(): string { return self::MODULE_ID; }
-    public static function moduleVersion(): string { return self::VERSION; }
     public static function isEditable(): bool { return self::EDITABLE; }
     public static function moduleConfig(): array { return require __DIR__ . '/config/config.php'; }
     public static function bootstrapClasses(): array { return [Bootstrap::class]; }
